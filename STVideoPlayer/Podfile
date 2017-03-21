@@ -1,0 +1,6 @@
+#use_frameworks!
+target 'STVideoPlayer' do
+    pod 'SDWebImage'
+    pod 'ZFDownload'
+#    pod 'SnapKit'
+end
