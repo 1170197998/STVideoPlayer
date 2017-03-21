@@ -33,7 +33,7 @@ class PlayerViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         UIApplication.shared.setStatusBarStyle(.lightContent, animated: true)
-//        navigationController?.isNavigationBarHidden = true
+        navigationController?.isNavigationBarHidden = true
         // pop回来自动播放
         if navigationController?.viewControllers.count == 2 && (playerView != nil) && isPlaying ?? false {
             isPlaying = false
@@ -44,7 +44,7 @@ class PlayerViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         UIApplication.shared.setStatusBarStyle(.default, animated: false)
-//        navigationController?.isNavigationBarHidden = false
+        navigationController?.isNavigationBarHidden = false
         // push出下一界面的时候暂停
         if navigationController?.viewControllers.count == 3 && (playerView != nil) && (playerView?.isPauseByUser)! {
             isPlaying = true
