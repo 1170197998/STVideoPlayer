@@ -143,7 +143,6 @@ class STPlayerView: UIView {
     
     fileprivate var controlView: UIView? {
         didSet {
-            //        controlView.delegate = self
             self.addSubview(controlView!)
             controlView?.snp.makeConstraints({ (make) in
                 make.top.leading.trailing.bottom.equalTo(self)
