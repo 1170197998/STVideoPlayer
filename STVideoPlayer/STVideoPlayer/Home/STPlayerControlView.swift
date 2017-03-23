@@ -8,8 +8,38 @@
 
 var bundle = "STVideoPlayer.bundle/"
 import UIKit
+
+
+/// 传递到顶层控制器的delegate
+protocol PlayerViewDelegate: NSObjectProtocol {
+    /// 返回按钮
+    func backButtonClick()
+    /// 下载按钮
+    func downloadButtonClick(videoUrl: URL)
+}
+
+/// 传递到playerView的delegate
+protocol PlayerControlViewDelagate: NSObjectProtocol {
+    /// 锁定屏幕按钮
+    func lockScreenButtonClick()
+    /// 播放按钮
+    func playerButtonClick()
+    /// 全屏播放按钮
+    func fullScreenButtonClick()
+    /// 重新播放按钮
+    func repeatButtonClick()
+    /// 中心区域播放按钮
+    func centerPlayButtonClick()
+    /// 播放失败按钮
+    func failButtonClick()
+}
+
+
 class STPlayerControlView: UIView {
     
+    weak var delegate: PlayerViewDelegate?
+    weak var delegateControl: PlayerControlViewDelagate?
+
     /// 占位图
     private let placeholderImageView: UIImageView = {
         let imageView = UIImageView()
@@ -256,6 +286,7 @@ class STPlayerControlView: UIView {
     
     private func makeSubViewsConstraints() {
         
+        //顶部视图---------------------------------------
         topImageView.snp.makeConstraints { (make) in
             make.leading.trailing.equalTo(self)
             make.top.equalTo(snp.top)
@@ -277,7 +308,7 @@ class STPlayerControlView: UIView {
             make.trailing.equalTo(-10)
             make.centerY.equalTo((backButton.snp.centerY))
         })
-        //-----------------------------------------
+        //底部视图-----------------------------------------
         bottomImageView.snp.makeConstraints({ (make) in
             make.leading.trailing.bottom.equalTo(self)
             make.height.equalTo(50)
@@ -313,27 +344,27 @@ class STPlayerControlView: UIView {
             make.width.height.equalTo(32)
         }
         //中心区域的视图----------------------------
-        repeatButton.snp.makeConstraints { (make) in
-            make.center.equalToSuperview()
-        }
-        playButton.snp.makeConstraints { (make) in
-            make.center.equalTo(self)
-            make.width.height.equalTo(50)
-        }
-        activity.snp.makeConstraints { (make) in
-            make.center.equalTo(self)
-            make.width.height.equalTo(45)
-        }
-        failButton.snp.makeConstraints { (make) in
-            make.center.equalTo(self)
-            make.width.equalTo(130)
-            make.height.equalTo(35)
-        }
-        fastView.snp.makeConstraints { (make) in
-            make.center.equalTo(self)
-            make.width.equalTo(130)
-            make.height.equalTo(80)
-        }
+//        repeatButton.snp.makeConstraints { (make) in
+//            make.center.equalToSuperview()
+//        }
+//        playButton.snp.makeConstraints { (make) in
+//            make.center.equalTo(self)
+//            make.width.height.equalTo(50)
+//        }
+//        activity.snp.makeConstraints { (make) in
+//            make.center.equalTo(self)
+//            make.width.height.equalTo(45)
+//        }
+//        failButton.snp.makeConstraints { (make) in
+//            make.center.equalTo(self)
+//            make.width.equalTo(130)
+//            make.height.equalTo(35)
+//        }
+//        fastView.snp.makeConstraints { (make) in
+//            make.center.equalTo(self)
+//            make.width.equalTo(130)
+//            make.height.equalTo(80)
+//        }
 
         placeholderImageView.snp.makeConstraints({ (make) in
             make.edges.equalTo(UIEdgeInsets.zero)
@@ -354,45 +385,39 @@ class STPlayerControlView: UIView {
     
     /// 返回按钮
     @objc private func backButtonClick() {
-        
+        delegate?.backButtonClick()
     }
     
     /// 锁定全屏按钮
     @objc private func lockScreenButtonClick() {
-        
+        delegateControl?.lockScreenButtonClick()
     }
     
     /// 下载按钮
     @objc private func downloadButtonClick() {
-        
+        //delegate?.downloadButtonClick(videoUrl: playerModel.videoUrl)
     }
     /// 播放按钮
     @objc private func playerButtonClick() {
-        
+        delegateControl?.playerButtonClick()
     }
     /// 全屏播放按钮
     @objc private func fullScreenButtonClick() {
-        
+        delegateControl?.fullScreenButtonClick()
     }
     /// 重新播放按钮
     @objc private func repeatButtonClick() {
-        
+        delegateControl?.repeatButtonClick()
     }
     /// 中心区域播放按钮
     @objc private func centerPlayButtonClick() {
-        
+        delegateControl?.centerPlayButtonClick()
     }
     /// 播放失败按钮
     @objc private func failButtonClick() {
-        
+        delegateControl?.failButtonClick()
     }
 
-    
-    
-    
-    
-    
-    
     
     
     
@@ -402,16 +427,6 @@ class STPlayerControlView: UIView {
     required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
 }
 

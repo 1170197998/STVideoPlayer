@@ -86,19 +86,22 @@ class PlayerViewController: UIViewController {
 }
 
 // MARK: - PlayerVideDelegate
-extension PlayerViewController: PlayerVideDelegate {
+extension PlayerViewController: PlayerViewDelegate {
     
-    /// 返回按钮事件
-    func controlViewBackAction(conttrolView: UIView, sender: UIButton) {
+    func backButtonClick() {
         _ = navigationController?.popViewController(animated: true)
     }
     
-    /// 下载视频
-    func playerDownload(urlString: String) {
+    func downloadButtonClick(videoUrl: URL) {
         //截取的下载地址，可以自己根据服务器的视频名称来赋值
+        let urlString = videoUrl.absoluteString
         let name = (urlString as NSString).lastPathComponent
         ZFDownloadManager.shared().downFileUrl(urlString, filename: name, fileimage: nil)
         //设置最多同时下载个数（默认是3）
         ZFDownloadManager.shared().maxCount = 4
+
+    }
+    /// 下载视频
+    func playerDownload(urlString: String) {
     }
 }
