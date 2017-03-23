@@ -10,10 +10,6 @@ import UIKit
 
 protocol STPlayerControlViewDelagate {
     
-//    /// 返回按钮事件
-//    func controlView(controlView: UIView, backAction: UIButton)
-//    /// cell中小视屏状态, 关闭按钮事件
-//    func controlView(controlView: UIView, closeAction: UIButton)
 }
 
 

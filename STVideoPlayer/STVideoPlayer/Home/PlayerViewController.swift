@@ -101,7 +101,4 @@ extension PlayerViewController: PlayerViewDelegate {
         ZFDownloadManager.shared().maxCount = 4
 
     }
-    /// 下载视频
-    func playerDownload(urlString: String) {
-    }
 }

@@ -819,6 +819,7 @@ class STPlayerView: UIView {
     }
 }
 
+// MARK: - PlayerControlViewDelagate
 extension STPlayerView: PlayerControlViewDelagate {
     
     func lockScreenButtonClick() {
