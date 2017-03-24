@@ -45,7 +45,7 @@ class STPlayerControlView: UIView {
         let imageView = UIImageView()
         return imageView
     }()
-    //顶部视图
+    //顶部视图--------------------------------------
     /// 标题
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -76,7 +76,7 @@ class STPlayerControlView: UIView {
         imageView.image = UIImage(named:  bundle.appending("ZFPlayer_top_shadow.png"))
         return imageView
     }()
-    //------------------------------------------------------------------
+    //底部视图-----------------------------------------------------------------
     /// 底部View
     private let bottomImageView: UIImageView = {
         let imageView = UIImageView()
@@ -119,7 +119,7 @@ class STPlayerControlView: UIView {
     private let fullScreenButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: bundle.appending("ZFPlayer_fullscreen")), for: .normal)
-        button.setImage(UIImage(named: bundle.appending("ZFPlayer_shrinkscreen")), for: .disabled)
+        button.setImage(UIImage(named: bundle.appending("ZFPlayer_shrinkscreen")), for: .selected)
         button.addTarget(self, action: #selector(fullScreenButtonClick), for: .touchUpInside)
         return button
     }()
@@ -282,6 +282,18 @@ class STPlayerControlView: UIView {
         addSubview(bottomImageView)
         
         makeSubViewsConstraints()
+        listeningRotating()
+    }
+    
+    /// 检测屏幕约束
+    private func listeningRotating() {
+        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+        NotificationCenter.default.addObserver(self, selector: #selector(onDeviceOrientationChange), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
+    }
+    
+    /// 屏幕旋转调用这里
+    @objc private func onDeviceOrientationChange() {
+        
     }
     
     private func makeSubViewsConstraints() {

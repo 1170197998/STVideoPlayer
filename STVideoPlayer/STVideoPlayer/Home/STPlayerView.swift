@@ -219,7 +219,7 @@ class STPlayerView: UIView {
         controlView?.playerCellPlay()
     }
     
-    private func addPlayerToFatherView(view: UIView) {
+    fileprivate func addPlayerToFatherView(view: UIView) {
         removeFromSuperview()
         view.addSubview(self)
         self.snp.makeConstraints { (make) in
@@ -332,153 +332,8 @@ class STPlayerView: UIView {
         }
     }
     
-    /// 屏幕方向发生变化
-    //UIDeviceOrientation      是机器硬件的当前旋转方向   这个你只能取值 不能设置
-    //UIInterfaceOrientation   是你程序界面的当前旋转方向   这个可以设置
-    @objc fileprivate func onDeviceOrientationChange() {
-        if (!(player != nil)) {
-            return
-        }
-        if STBrightnessView.shared.isLockScreen {
-            return
-        }
-        if didEnterBackground {
-            return
-        }
-        // 当前设备方向
-        let orientation = UIDevice.current.orientation
-        // 如果手机硬件屏幕朝上或者屏幕朝下或者未知
-        if orientation == UIDeviceOrientation.faceUp || orientation == UIDeviceOrientation.faceDown || orientation == UIDeviceOrientation.unknown {
-            return
-        }
-        let interfaceOrientation: UIInterfaceOrientation = UIInterfaceOrientation(rawValue: orientation.rawValue)!
-        switch interfaceOrientation {
-            //屏幕竖直,home键在上面
-        case UIInterfaceOrientation.portraitUpsideDown: break
-            //屏幕竖直,home键在下面
-        case UIInterfaceOrientation.portrait:
-            if isFullScreen {
-                toOrientation(orientation: UIInterfaceOrientation.portrait)
-            }; break
-            //屏幕水平,home键在左
-        case UIInterfaceOrientation.landscapeLeft:
-            if isFullScreen == false {
-                toOrientation(orientation: UIInterfaceOrientation.landscapeLeft)
-                isFullScreen = true
-            } else {
-                toOrientation(orientation: UIInterfaceOrientation.landscapeLeft)
-            }; break
-            //屏幕水平,home键在右
-        case UIInterfaceOrientation.landscapeRight:
-            if isFullScreen == false {
-                toOrientation(orientation: UIInterfaceOrientation.landscapeRight)
-                isFullScreen = true
-            } else {
-                toOrientation(orientation: UIInterfaceOrientation.landscapeRight)
-            }; break
-            
-        default:
-            break
-        }
-    }
-    
-    /// 旋转
-    ///
-    /// - Parameter orientation: 要旋转的方向
-    private func toOrientation(orientation: UIInterfaceOrientation) {
-        
-        //获取当前状态栏的方向
-        let currentOrientation = UIApplication.shared.statusBarOrientation
-        //如果当前的方向和要旋转的方向一致,就不做任何操作
-        if currentOrientation == orientation {
-            return
-        }
-        //根据要旋转的方向,用snapKit重新布局
-        //UIInterfaceOrientation.portrait屏幕竖直,home键在下面
-        if orientation != UIInterfaceOrientation.portrait {
-            // 这个地方加判断是为了从全屏的一侧,直接到全屏的另一侧不用修改限制,否则会出错;
-            if currentOrientation == UIInterfaceOrientation.portrait {
-                self.removeFromSuperview()
-                let brightnessView = STBrightnessView.shared
-                UIApplication.shared.keyWindow?.insertSubview(self, belowSubview: brightnessView)
-                //从全屏的一侧,直接到全屏的另一侧不用修改限制
-                self.snp.makeConstraints({ (make) in
-                    make.width.equalTo(UIScreen.main.bounds.size.height)
-                    make.height.equalTo(UIScreen.main.bounds.size.width)
-                    make.center.equalTo(UIApplication.shared.keyWindow!)
-                })
-            }
-        }
-        //状态栏旋转
-        UIApplication.shared.setStatusBarOrientation(orientation, animated: false)
-        UIView.beginAnimations(nil, context: nil)
-        UIView.setAnimationDuration(0.35)
-        self.transform = CGAffineTransform.identity
-        self.transform = getTransformRotationAngle()
-        UIView.commitAnimations()
-        controlView?.layoutIfNeeded()
-        controlView?.setNeedsLayout()
-    }
-    
-    /// 状态条发生变化
-    @objc fileprivate func onStatusBarOrientationChange() {
-        if !didEnterBackground {
-            //获取当前状态栏方向
-            let currentOrientation = UIApplication.shared.statusBarOrientation
-            if currentOrientation == UIInterfaceOrientation.portrait {
-                setOrientationPortraitConstraint()
-                if cellPlayerOnCenter! {
-                    tableView?.scrollToRow(at: indexPath as! IndexPath, at: .middle, animated: false)
-                }
-                brightnessView?.removeFromSuperview()
-                UIApplication.shared.keyWindow?.addSubview(brightnessView ?? UIView())
-                brightnessView?.snp.makeConstraints({ (make) in
-                    make.width.height.equalTo(155)
-                    make.leading.equalTo((UIScreen.main.bounds.width - 155) / 2)
-                    make.top.equalTo((UIScreen.main.bounds.height - 155) / 2)
-                })
-            } else {
-                if currentOrientation == UIInterfaceOrientation.landscapeRight {
-                    toOrientation(orientation: UIInterfaceOrientation.landscapeRight)
-                } else if currentOrientation == UIInterfaceOrientation.landscapeLeft {
-                    toOrientation(orientation: UIInterfaceOrientation.landscapeLeft)
-                }
-                brightnessView?.removeFromSuperview()
-                addSubview((brightnessView ?? UIView())!)
-                brightnessView?.snp.makeConstraints({ (make) in
-                    make.center.equalTo(self)
-                    make.width.height.equalTo(155)
-                })
-            }
-        }
-    }
-    
-    /// 设置横屏约束
-    private func setOrientationLandscapeConstraint(orientation: UIInterfaceOrientation) {
-        toOrientation(orientation: orientation)
-        isFullScreen = true
-    }
-    
-    /// 设置竖屏约束
-    private func setOrientationPortraitConstraint() {
-        if isCellVideo  {
-            let cell = tableView?.cellForRow(at: indexPath as! IndexPath)
-            let visableCells = tableView?.visibleCells
-            isBottomVideo = false
-            if !(visableCells?.contains(cell!))! {
-                updatePlayerViewToBottom()
-            } else {
-                addPlayerToFatherView(view: (playerModel?.fatherView)!)
-            }
-        } else {
-            addPlayerToFatherView(view: (playerModel?.fatherView)!)
-        }
-        toOrientation(orientation: UIInterfaceOrientation.portrait)
-        isFullScreen = false
-    }
-    
     /// 缩小到底部 显示小视频
-    private func updatePlayerViewToBottom() {
+    fileprivate func updatePlayerViewToBottom() {
         if isBottomVideo {
             return
         }
@@ -503,53 +358,9 @@ class STPlayerView: UIView {
         controlView?.playerBottomShrinkPlay()
     }
     
-    /// 获取变换的旋转角度
-    private func getTransformRotationAngle() -> CGAffineTransform {
-        let interfaceOrientation = UIApplication.shared.statusBarOrientation
-        if interfaceOrientation == UIInterfaceOrientation.portrait {
-            return CGAffineTransform.identity
-        } else if interfaceOrientation == UIInterfaceOrientation.landscapeLeft {
-            return CGAffineTransform(rotationAngle: (CGFloat)(-M_PI_2))
-        } else if (interfaceOrientation == UIInterfaceOrientation.landscapeRight) {
-            return CGAffineTransform(rotationAngle: CGFloat(M_PI_2))
-        }
-        return CGAffineTransform.identity
-    }
-    
-    /// 全屏
-    private func fullScreenAction() {
-        if STBrightnessView.shared.isLockScreen {
-            unLockTheScreen()
-            return
-        }
-        if isFullScreen {
-            interfaceOrientation(orientation: UIInterfaceOrientation.portrait)
-            isFullScreen = false
-            return
-        } else {
-            let orientation = UIDevice.current.orientation
-            if orientation == UIDeviceOrientation.landscapeRight {
-                interfaceOrientation(orientation: UIInterfaceOrientation.landscapeLeft)
-            } else {
-                interfaceOrientation(orientation: UIInterfaceOrientation.landscapeRight)
-            }
-            isFullScreen = true
-        }
-    }
-    
-    /// 屏幕旋转
-    ///
-    /// - Parameter orientation: 屏幕方向
-    private func interfaceOrientation(orientation: UIInterfaceOrientation) {
-        if orientation == UIInterfaceOrientation.landscapeRight || orientation == UIInterfaceOrientation.landscapeLeft {
-            setOrientationLandscapeConstraint(orientation: orientation)
-        } else if orientation == UIInterfaceOrientation.portrait {
-            setOrientationPortraitConstraint()
-        }
-    }
     
     /// 解锁屏幕锁定方向
-    private func unLockTheScreen() {
+    fileprivate func unLockTheScreen() {
         STBrightnessView.shared.isLockScreen = false
         controlView?.playerPlayBtnState(state: false)
         isLocked = false
@@ -766,13 +577,215 @@ class STPlayerView: UIView {
         
     }
     
-    /// KVO TableViewCOntentOffset
+    /// KVO TableViewContentOffset
     private func handleScrollOffsetWithDict(dict: Dictionary<NSKeyValueChangeKey, Any>) {
         
     }
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+// MARK: - 屏幕旋转相关操作
+extension STPlayerView {
+    /// 屏幕方向发生变化调用这里
+    //UIDeviceOrientation      是机器硬件的当前旋转方向   这个只能取值 不能设置
+    //UIInterfaceOrientation   是你程序界面的当前旋转方向   这个可以设置
+    @objc fileprivate func onDeviceOrientationChange() {
+        if (!(player != nil)) {
+            return
+        }
+        if STBrightnessView.shared.isLockScreen {
+            return
+        }
+        if didEnterBackground {
+            return
+        }
+        // 当前设备方向
+        let orientation = UIDevice.current.orientation
+        // 如果手机硬件屏幕朝上或者屏幕朝下或者未知
+        if orientation == UIDeviceOrientation.faceUp || orientation == UIDeviceOrientation.faceDown || orientation == UIDeviceOrientation.unknown {
+            return
+        }
+        let interfaceOrientation: UIInterfaceOrientation = UIInterfaceOrientation(rawValue: orientation.rawValue)!
+        switch interfaceOrientation {
+        //屏幕竖直,home键在上面
+        case UIInterfaceOrientation.portraitUpsideDown: break
+        //屏幕竖直,home键在下面
+        case UIInterfaceOrientation.portrait:
+            if isFullScreen {
+                toOrientation(orientation: UIInterfaceOrientation.portrait)
+            }; break
+        //屏幕水平,home键在左
+        case UIInterfaceOrientation.landscapeLeft:
+            if isFullScreen == false {
+                toOrientation(orientation: UIInterfaceOrientation.landscapeLeft)
+                isFullScreen = true
+            } else {
+                toOrientation(orientation: UIInterfaceOrientation.landscapeLeft)
+            }; break
+        //屏幕水平,home键在右
+        case UIInterfaceOrientation.landscapeRight:
+            if isFullScreen == false {
+                toOrientation(orientation: UIInterfaceOrientation.landscapeRight)
+                isFullScreen = true
+            } else {
+                toOrientation(orientation: UIInterfaceOrientation.landscapeRight)
+            }; break
+            
+        default:
+            break
+        }
+    }
+    
+    /// 旋转
+    ///
+    /// - Parameter orientation: 要旋转的方向
+    private func toOrientation(orientation: UIInterfaceOrientation) {
+        
+        //获取当前状态栏的方向
+        let currentOrientation = UIApplication.shared.statusBarOrientation
+        //如果当前的方向和要旋转的方向一致,就不做任何操作
+        if currentOrientation == orientation {
+            return
+        }
+        //根据要旋转的方向,重新布局
+        //UIInterfaceOrientation.portrait屏幕竖直,home键在下面
+        if orientation != UIInterfaceOrientation.portrait {
+            // 这个地方加判断是为了从全屏的一侧,直接到全屏的另一侧不用修改限制,否则会出错;
+            if currentOrientation == UIInterfaceOrientation.portrait {
+                self.removeFromSuperview()
+                let brightnessView = STBrightnessView.shared
+                UIApplication.shared.keyWindow?.insertSubview(self, belowSubview: brightnessView)
+                //从全屏的一侧,直接到全屏的另一侧不用修改限制
+                self.snp.makeConstraints({ (make) in
+                    make.width.equalTo(UIScreen.main.bounds.size.height)
+                    make.height.equalTo(UIScreen.main.bounds.size.width)
+                    make.center.equalTo(UIApplication.shared.keyWindow!)
+                })
+            }
+        }
+        //状态栏旋转
+        UIApplication.shared.setStatusBarOrientation(orientation, animated: false)
+        UIView.beginAnimations(nil, context: nil)
+        UIView.setAnimationDuration(0.35)
+        self.transform = CGAffineTransform.identity
+        self.transform = getTransformRotationAngle()
+        UIView.commitAnimations()
+        controlView?.layoutIfNeeded()
+        controlView?.setNeedsLayout()
+    }
+    
+    /// 获取变换的旋转角度
+    private func getTransformRotationAngle() -> CGAffineTransform {
+        let interfaceOrientation = UIApplication.shared.statusBarOrientation
+        if interfaceOrientation == UIInterfaceOrientation.portrait {
+            return CGAffineTransform.identity
+        } else if interfaceOrientation == UIInterfaceOrientation.landscapeLeft {
+            return CGAffineTransform(rotationAngle: (CGFloat)(-M_PI_2))
+        } else if (interfaceOrientation == UIInterfaceOrientation.landscapeRight) {
+            return CGAffineTransform(rotationAngle: CGFloat(M_PI_2))
+        }
+        return CGAffineTransform.identity
+    }
+    
+    /// 全屏
+    fileprivate func fullScreenAction() {
+        if STBrightnessView.shared.isLockScreen {
+            unLockTheScreen()
+            return
+        }
+        if isFullScreen {
+            interfaceOrientation(orientation: UIInterfaceOrientation.portrait)
+            isFullScreen = false
+            return
+        } else {
+            let orientation = UIDevice.current.orientation
+            if orientation == UIDeviceOrientation.landscapeRight {
+                interfaceOrientation(orientation: UIInterfaceOrientation.landscapeLeft)
+            } else {
+                interfaceOrientation(orientation: UIInterfaceOrientation.landscapeRight)
+            }
+            isFullScreen = true
+        }
+    }
+    
+    /// 屏幕旋转
+    ///
+    /// - Parameter orientation: 屏幕方向
+    fileprivate func interfaceOrientation(orientation: UIInterfaceOrientation) {
+        if orientation == UIInterfaceOrientation.landscapeRight || orientation == UIInterfaceOrientation.landscapeLeft {
+            setOrientationLandscapeConstraint(orientation: orientation)
+        } else if orientation == UIInterfaceOrientation.portrait {
+            setOrientationPortraitConstraint()
+        }
+    }
+
+    /// 状态条发生变化
+    @objc fileprivate func onStatusBarOrientationChange() {
+        if !didEnterBackground {
+            //获取当前状态栏方向
+            let currentOrientation = UIApplication.shared.statusBarOrientation
+            if currentOrientation == UIInterfaceOrientation.portrait {
+                setOrientationPortraitConstraint()
+                if cellPlayerOnCenter! {
+                    tableView?.scrollToRow(at: indexPath as! IndexPath, at: .middle, animated: false)
+                }
+                brightnessView?.removeFromSuperview()
+                UIApplication.shared.keyWindow?.addSubview(brightnessView ?? UIView())
+                brightnessView?.snp.makeConstraints({ (make) in
+                    make.width.height.equalTo(155)
+                    make.leading.equalTo((UIScreen.main.bounds.width - 155) / 2)
+                    make.top.equalTo((UIScreen.main.bounds.height - 155) / 2)
+                })
+            } else {
+                if currentOrientation == UIInterfaceOrientation.landscapeRight {
+                    toOrientation(orientation: UIInterfaceOrientation.landscapeRight)
+                } else if currentOrientation == UIInterfaceOrientation.landscapeLeft {
+                    toOrientation(orientation: UIInterfaceOrientation.landscapeLeft)
+                }
+                brightnessView?.removeFromSuperview()
+                addSubview((brightnessView ?? UIView())!)
+                brightnessView?.snp.makeConstraints({ (make) in
+                    make.center.equalTo(self)
+                    make.width.height.equalTo(155)
+                })
+            }
+        }
+    }
+    
+    /// 设置横屏约束
+    private func setOrientationLandscapeConstraint(orientation: UIInterfaceOrientation) {
+        toOrientation(orientation: orientation)
+        isFullScreen = true
+    }
+    
+    /// 设置竖屏约束
+    private func setOrientationPortraitConstraint() {
+        if isCellVideo  {
+            let cell = tableView?.cellForRow(at: indexPath as! IndexPath)
+            let visableCells = tableView?.visibleCells
+            isBottomVideo = false
+            if !(visableCells?.contains(cell!))! {
+                updatePlayerViewToBottom()
+            } else {
+                addPlayerToFatherView(view: (playerModel?.fatherView)!)
+            }
+        } else {
+            addPlayerToFatherView(view: (playerModel?.fatherView)!)
+        }
+        toOrientation(orientation: UIInterfaceOrientation.portrait)
+        isFullScreen = false
+    }
+}
+
+
+// MARK: - 音量耳机相关
+extension STPlayerView {
+    
     /// 获取系统音量
-    private func configureVolume() {
+    fileprivate func configureVolume() {
         let volumeView = MPVolumeView()
         volumeViewSlider = nil
         for view in volumeView.subviews {
@@ -782,19 +795,19 @@ class STPlayerView: UIView {
             }
         }
         // 两种try
-//        try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
-//        let success = try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
-//        do {
-//            //没有返回值
-//            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
-//            NotificationCenter.default.addObserver(self, selector: #selector(audioRouteChangeListenerCallback(notification:)), name: NSNotification.Name.AVAudioSessionRouteChange, object: nil)
-//        } catch  {
-//        }
+        //        try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+        //        let success = try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+        //        do {
+        //            //没有返回值
+        //            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+        //            NotificationCenter.default.addObserver(self, selector: #selector(audioRouteChangeListenerCallback(notification:)), name: NSNotification.Name.AVAudioSessionRouteChange, object: nil)
+        //        } catch  {
+        //        }
     }
-    
+
     /// 耳机插入 拔出事件
     @objc private func audioRouteChangeListenerCallback(notification: NSNotification) {
-
+        
         let infoDict = notification.userInfo
         guard let routeChangeReason = infoDict?[AVAudioSessionRouteChangeReasonKey] as! AVAudioSessionRouteChangeReason? else {
             return
@@ -813,10 +826,6 @@ class STPlayerView: UIView {
         default: break
         }
     }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 }
 
 // MARK: - PlayerControlViewDelagate
@@ -829,7 +838,7 @@ extension STPlayerView: PlayerControlViewDelagate {
         
     }
     func fullScreenButtonClick() {
-        
+        fullScreenAction()
     }
     func repeatButtonClick() {
         
