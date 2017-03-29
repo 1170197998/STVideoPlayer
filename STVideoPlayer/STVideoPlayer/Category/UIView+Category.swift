@@ -28,9 +28,9 @@ extension UIView {
     public func playerCancelAutoFadeOutControlView() {
         
     }
-    public func playerShowControlView() {
-        
-    }
+//    public func playerShowControlView() {
+//        
+//    }
     //Method cannot be declared public because its parameter uses an internal type
 //    public func playerModel(playerModel: STPlayerModel) {
 //        

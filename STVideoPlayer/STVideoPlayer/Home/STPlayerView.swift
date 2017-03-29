@@ -55,7 +55,7 @@ class STPlayerView: UIView {
     weak var delegate: PlayerViewDelegate? {
         didSet {
             /// 做了一个代理传递的效果http://blog.csdn.net/feng2qing/article/details/51489548?locationNum=1&fps=1, 本界面不需要实现代理方法, 直接传递给上层控制器
-            (controlView as! STPlayerControlView).delegate = delegate
+            (controlView!).delegate = delegate
         }
     }
     /// 播放器状态
@@ -137,7 +137,7 @@ class STPlayerView: UIView {
     /// 是否正在拖拽
     fileprivate var isDragging: Bool? = false
     /// 控制层View
-    fileprivate var controlView: UIView?
+    fileprivate var controlView: STPlayerControlView?
     fileprivate var playerModel: STPlayerModel! {
         didSet {
             if ((playerModel?.seekTime) != nil) {
@@ -375,13 +375,13 @@ class STPlayerView: UIView {
     func playerControlView(controlView: UIView?, playerModel: STPlayerModel) {
         if (controlView == nil) {
             self.controlView = STPlayerControlView()
-            (self.controlView as! STPlayerControlView).delegateControl = self
+            (self.controlView!).delegateControl = self
             addSubview(self.controlView!)
             self.controlView?.snp.makeConstraints({ (make) in
                 make.top.leading.trailing.bottom.equalTo(self)
             })
         } else {
-            self.controlView = controlView
+            self.controlView = controlView as? STPlayerControlView
         }
         self.playerModel = playerModel
     }
@@ -683,9 +683,9 @@ extension STPlayerView {
         if interfaceOrientation == UIInterfaceOrientation.portrait {
             return CGAffineTransform.identity
         } else if interfaceOrientation == UIInterfaceOrientation.landscapeLeft {
-            return CGAffineTransform(rotationAngle: (CGFloat)(-M_PI_2))
+            return CGAffineTransform(rotationAngle: (CGFloat)(-Double.pi / 2))
         } else if (interfaceOrientation == UIInterfaceOrientation.landscapeRight) {
-            return CGAffineTransform(rotationAngle: CGFloat(M_PI_2))
+            return CGAffineTransform(rotationAngle: CGFloat(Double.pi / 2))
         }
         return CGAffineTransform.identity
     }
@@ -730,7 +730,7 @@ extension STPlayerView {
             if currentOrientation == UIInterfaceOrientation.portrait {
                 setOrientationPortraitConstraint()
                 if cellPlayerOnCenter! {
-                    tableView?.scrollToRow(at: indexPath as! IndexPath, at: .middle, animated: false)
+                    tableView?.scrollToRow(at: indexPath! as IndexPath, at: .middle, animated: false)
                 }
                 brightnessView?.removeFromSuperview()
                 UIApplication.shared.keyWindow?.addSubview(brightnessView ?? UIView())
@@ -764,7 +764,7 @@ extension STPlayerView {
     /// 设置竖屏约束
     private func setOrientationPortraitConstraint() {
         if isCellVideo  {
-            let cell = tableView?.cellForRow(at: indexPath as! IndexPath)
+            let cell = tableView?.cellForRow(at: indexPath! as IndexPath)
             let visableCells = tableView?.visibleCells
             isBottomVideo = false
             if !(visableCells?.contains(cell!))! {
@@ -847,6 +847,18 @@ extension STPlayerView: PlayerControlViewDelagate {
         
     }
     func failButtonClick() {
+        
+    }
+    func progressSliderTouchBegin() {
+        
+    }
+    func progressSliderValueChange() {
+        
+    }
+    func progressSliderTouchEnded() {
+        
+    }
+    func tapSliderAction() {
         
     }
 }

@@ -32,6 +32,14 @@ protocol PlayerControlViewDelagate: NSObjectProtocol {
     func centerPlayButtonClick()
     /// 播放失败按钮
     func failButtonClick()
+    /// 滑竿开始滑动
+    func progressSliderTouchBegin()
+    /// 滑竿正在滑动
+    func progressSliderValueChange()
+    /// 滑竿结束滑动
+    func progressSliderTouchEnded()
+    /// tap滑竿
+    func tapSliderAction()
 }
 
 
@@ -104,6 +112,30 @@ class STPlayerControlView: UIView {
     /// 滑竿
     private let videoSlider: ASValueTrackingSlider = {
         let slider = ASValueTrackingSlider()
+        slider.popUpViewCornerRadius = 0.0
+        slider.popUpViewColor = UIColor.init(red: 19 / 255.0, green: 19 / 255.0, blue: 9 / 255.0, alpha: 1)
+        slider.popUpViewArrowLength = 8
+        slider.setThumbImage(UIImage(named: bundle.appending("ZFPlayer_slider")), for: .normal)
+        slider.maximumValue = 1
+        slider.minimumTrackTintColor = UIColor.white
+        slider.maximumTrackTintColor = UIColor.init(colorLiteralRed: 0.5, green: 0.5, blue: 0.5, alpha: 0.5)
+        // 开始滑动
+        slider.addTarget(self, action: #selector(progressSliderTouchBegin(sender:)), for: .touchDown)
+        //正在滑动
+        slider.addTarget(self, action: #selector(progressSliderValueChange(sender:)), for: .valueChanged)
+        //结束滑动
+        slider.addTarget(self, action: #selector(progressSliderTouchEnded(sender:)), for: [.touchUpInside,.touchCancel,.touchUpOutside])
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapSliderAction(pan:)))
+        slider.addGestureRecognizer(tap)
+        
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(panSliderAction))
+        pan.delegate = self as? UIGestureRecognizerDelegate
+        pan.maximumNumberOfTouches = 1
+        pan.delaysTouchesBegan = true
+        pan.delaysTouchesEnded = true
+        pan.cancelsTouchesInView = true
+        slider.addGestureRecognizer(pan)
         return slider
     }()
     /// 视频总时长
@@ -430,22 +462,37 @@ class STPlayerControlView: UIView {
         delegateControl?.failButtonClick()
     }
 
+    /// 开始滑动
+    @objc private func progressSliderTouchBegin(sender: ASValueTrackingSlider) {
+        delegateControl?.progressSliderTouchBegin()
+    }
+    /// 正在滑动
+    @objc private func progressSliderValueChange(sender: ASValueTrackingSlider) {
+        delegateControl?.progressSliderValueChange()
+    }
+    /// 滑动结束
+    @objc private func progressSliderTouchEnded(sender: ASValueTrackingSlider) {
+        delegateControl?.progressSliderTouchEnded()
+    }
+    /// tap手势
+    @objc private func tapSliderAction(pan: UIPanGestureRecognizer) {
+        delegateControl?.tapSliderAction()
+    }
+    /// 不做处理,为了在滑动slider其他地方不响应其他手势
+    @objc private func panSliderAction(){}
     
-    
-    
-    
-    
+    /// Public Method
+    public func playerShowControlView() {
+        if showing {
+            
+        }
+    }
     
     required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
 }
 
-
-extension String {
-    func stringByAppendingPathComponent(path: String) -> String {
-        let nsSt = self as NSString
-        return nsSt.appendingPathComponent(path)
-    }
+extension STPlayerControlView: UIGestureRecognizerDelegate {
+    
 }
