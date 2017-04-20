@@ -55,7 +55,7 @@ class STPlayerView: UIView {
     weak var delegate: PlayerViewDelegate? {
         didSet {
             /// 做了一个代理传递的效果http://blog.csdn.net/feng2qing/article/details/51489548?locationNum=1&fps=1, 本界面不需要实现代理方法, 直接传递给上层控制器
-            (controlView as! STPlayerControlView).delegate = delegate
+            (controlView!).delegate = delegate
         }
     }
     /// 播放器状态
@@ -137,7 +137,7 @@ class STPlayerView: UIView {
     /// 是否正在拖拽
     fileprivate var isDragging: Bool? = false
     /// 控制层View
-    fileprivate var controlView: UIView?
+    fileprivate var controlView: STPlayerControlView?
     fileprivate var playerModel: STPlayerModel! {
         didSet {
             if ((playerModel?.seekTime) != nil) {
@@ -358,7 +358,6 @@ class STPlayerView: UIView {
         controlView?.playerBottomShrinkPlay()
     }
     
-    
     /// 解锁屏幕锁定方向
     fileprivate func unLockTheScreen() {
         STBrightnessView.shared.isLockScreen = false
@@ -375,13 +374,13 @@ class STPlayerView: UIView {
     func playerControlView(controlView: UIView?, playerModel: STPlayerModel) {
         if (controlView == nil) {
             self.controlView = STPlayerControlView()
-            (self.controlView as! STPlayerControlView).delegateControl = self
+            (self.controlView!).delegateControl = self
             addSubview(self.controlView!)
             self.controlView?.snp.makeConstraints({ (make) in
                 make.top.leading.trailing.bottom.equalTo(self)
             })
         } else {
-            self.controlView = controlView
+            self.controlView = controlView as? STPlayerControlView
         }
         self.playerModel = playerModel
     }
@@ -847,6 +846,18 @@ extension STPlayerView: PlayerControlViewDelagate {
         
     }
     func failButtonClick() {
+        
+    }
+    func progressSliderTouchBegin() {
+        
+    }
+    func progressSliderValueChange() {
+        
+    }
+    func progressSliderTouchEnded() {
+        
+    }
+    func tapSliderAction() {
         
     }
 }
