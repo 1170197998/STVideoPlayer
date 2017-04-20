@@ -683,9 +683,9 @@ extension STPlayerView {
         if interfaceOrientation == UIInterfaceOrientation.portrait {
             return CGAffineTransform.identity
         } else if interfaceOrientation == UIInterfaceOrientation.landscapeLeft {
-            return CGAffineTransform(rotationAngle: (CGFloat)(-M_PI_2))
+            return CGAffineTransform(rotationAngle: (CGFloat)(-Double.pi/2))
         } else if (interfaceOrientation == UIInterfaceOrientation.landscapeRight) {
-            return CGAffineTransform(rotationAngle: CGFloat(M_PI_2))
+            return CGAffineTransform(rotationAngle: CGFloat(Double.pi/2))
         }
         return CGAffineTransform.identity
     }
@@ -730,7 +730,7 @@ extension STPlayerView {
             if currentOrientation == UIInterfaceOrientation.portrait {
                 setOrientationPortraitConstraint()
                 if cellPlayerOnCenter! {
-                    tableView?.scrollToRow(at: indexPath as! IndexPath, at: .middle, animated: false)
+                    tableView?.scrollToRow(at: indexPath! as IndexPath, at: .middle, animated: false)
                 }
                 brightnessView?.removeFromSuperview()
                 UIApplication.shared.keyWindow?.addSubview(brightnessView ?? UIView())
@@ -764,7 +764,7 @@ extension STPlayerView {
     /// 设置竖屏约束
     private func setOrientationPortraitConstraint() {
         if isCellVideo  {
-            let cell = tableView?.cellForRow(at: indexPath as! IndexPath)
+            let cell = tableView?.cellForRow(at: indexPath! as IndexPath)
             let visableCells = tableView?.visibleCells
             isBottomVideo = false
             if !(visableCells?.contains(cell!))! {

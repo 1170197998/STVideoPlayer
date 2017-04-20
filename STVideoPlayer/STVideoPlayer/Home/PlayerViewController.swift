@@ -99,6 +99,5 @@ extension PlayerViewController: PlayerViewDelegate {
         ZFDownloadManager.shared().downFileUrl(urlString, filename: name, fileimage: nil)
         //设置最多同时下载个数（默认是3）
         ZFDownloadManager.shared().maxCount = 4
-
     }
 }

@@ -15,5 +15,4 @@ class ListViewController: UIViewController {
 
         view.backgroundColor = UIColor.white
     }
-
 }
