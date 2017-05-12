@@ -834,7 +834,22 @@ extension STPlayerView: PlayerControlViewDelagate {
         
     }
     func playerButtonClick() {
-        
+        isPauseByUser = !isPauseByUser
+        if isPauseByUser {
+            pause()
+            if playerState == .Playing {
+                playerState = .Pause
+            }
+        } else {
+            play()
+            if playerState == .Pause {
+                playerState = .Playing
+            }
+        }
+        if !isAutoPlay {
+            isAutoPlay = true
+            configPLayer()
+        }
     }
     func fullScreenButtonClick() {
         fullScreenAction()

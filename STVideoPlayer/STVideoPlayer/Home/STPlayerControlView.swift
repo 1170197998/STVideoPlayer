@@ -9,7 +9,6 @@
 var bundle = "STVideoPlayer.bundle/"
 import UIKit
 
-
 /// 传递到顶层控制器的delegate
 protocol PlayerViewDelegate: NSObjectProtocol {
     /// 返回按钮
@@ -96,7 +95,7 @@ class STPlayerControlView: UIView {
     private let startButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: bundle.appending("ZFPlayer_play")), for: .normal)
-        button.setImage(UIImage(named: bundle.appending("ZFPlayer_pause")), for: .disabled)
+        button.setImage(UIImage(named: bundle.appending("ZFPlayer_pause")), for: .selected)
         button.addTarget(self, action: #selector(playerButtonClick), for: .touchUpInside)
         return button
     }()
@@ -328,6 +327,17 @@ class STPlayerControlView: UIView {
         
     }
     
+    /// 播放按钮状态
+    public func playerPlayBtnState(state: Bool) {
+        startButton.isSelected = state
+    }
+    
+    /// 下载按钮的状态
+    public func playerDownloadBtnState(state: Bool) {
+        downloadButton.isSelected = state
+    }
+    
+    /// 添加约束
     private func makeSubViewsConstraints() {
         
         //顶部视图---------------------------------------

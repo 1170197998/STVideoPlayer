@@ -21,9 +21,9 @@ extension UIView {
         
     }
     
-    public func playerPlayBtnState(state: Bool) {
-        
-    }
+//    public func playerPlayBtnState(state: Bool) {
+//        
+//    }
     
     public func playerCancelAutoFadeOutControlView() {
         
@@ -40,9 +40,9 @@ extension UIView {
         
     }
     
-    public func playerDownloadBtnState(state: Bool) {
-        
-    }
+//    public func playerDownloadBtnState(state: Bool) {
+//        
+//    }
     
     public func playerPlayEnd() {
         
