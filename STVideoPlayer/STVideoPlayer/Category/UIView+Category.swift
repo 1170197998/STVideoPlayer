@@ -65,5 +65,4 @@ extension UIView {
     public func playerSetProgress(progress: CGFloat) {
         
     }
-    
 }
